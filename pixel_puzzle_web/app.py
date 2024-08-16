@@ -12,14 +12,13 @@ https://tutorial.helloflask.com/static/
 https://qiita.com/mink0212/items/a4eb875f19b0e47718d3
 """
 
-import tempfile
 from base64 import b64decode, b64encode
 from pathlib import Path
 from typing import Union
 
-import flask
 import numpy as np
-from flask import Flask, make_response, render_template, request, send_file
+from flask import (Flask, Response, after_this_request, make_response,
+                   render_template, request, send_file)
 from PIL import Image
 
 app = Flask(__name__)
@@ -130,14 +129,6 @@ def recover_pixels(shuffled_image: str,
     )
 
 
-def cleanup_temp_files(file_paths: list) -> None:
-    """
-    __doc__
-    """
-    for file_path in file_paths:
-        Path(file_path).unlink()
-
-
 @app.route("/")
 def index() -> str:
     """
@@ -147,80 +138,96 @@ def index() -> str:
 
 
 @app.route("/encode", methods=["POST"])
-def encode() -> flask.Response:
+def encode() -> Response:
     """
     __doc__
     """
+    upload_path = Path('./files')
+    download_path = Path('./files') / "encoded.txt"
+
+    upload_path.mkdir(parents=True, exist_ok=True)
+
     image_to_encode = request.files["image_to_encode"]
-    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-        image_to_encode.save(temp_file.name)
-        encoded_text = temp_file.name + ".txt"
-        encode_base64(temp_file.name, encoded_text)
-        response = make_response(send_file(encoded_text))
-        response.headers["Content-Disposition"] = "inline; filename=encoded.txt"
-    cleanup_temp_files([temp_file.name, encoded_text])
+    upload_file_path = upload_path / image_to_encode.filename
+    image_to_encode.save(upload_file_path)
+
+    encode_base64(upload_file_path, download_path)
+
+    response = make_response(send_file(download_path))
+    response.headers["Content-Disposition"] = f"attachment; filename={download_path.name}"
     return response
 
 
 @app.route("/decode", methods=["POST"])
-def decode() -> flask.Response:
+def decode() -> Response:
     """
     __doc__
     """
+    upload_path = Path('./files')
+    download_path = Path('./files') / "decoded.png"
+
+    upload_path.mkdir(parents=True, exist_ok=True)
+
     encoded_text = request.files["encoded_text"]
-    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-        encoded_text.save(temp_file.name)
-        decoded_image = temp_file.name + ".png"
-        decode_base64(temp_file.name, decoded_image)
-        response = make_response(send_file(decoded_image))
-        response.headers["Content-Disposition"] = "inline; filename=decoded.png"
-    # cleanup_temp_files([temp_file.name, decoded_image])
+    upload_file_path = upload_path / encoded_text.filename
+    encoded_text.save(upload_file_path)
+
+    decode_base64(upload_file_path, download_path)
+
+    response = make_response(send_file(download_path))
+    response.headers["Content-Disposition"] = f"attachment; filename={download_path.name}"
     return response
 
 
 @app.route("/shuffle", methods=["POST"])
-def shuffle() -> flask.Response:
+def shuffle() -> Response:
     """
     __doc__
     """
+    upload_path = Path('./files')
+    download_path = Path('./files') / "shuffled.png"
+
+    upload_path.mkdir(parents=True, exist_ok=True)
+
     origin_image = request.files["origin_image"]
-    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-        origin_image.save(temp_file.name)
-        shuffled_image = temp_file.name + ".png"
-        seed = request.form.get("seed")
-        seed = None if seed == "no" else int(seed)
-        index_file = temp_file.name + ".npz" if seed is None else None
-        image_quality = request.form.get("image_quality")
-        shuffle_pixels(temp_file.name, shuffled_image, seed, index_file, image_quality)
-        response = make_response(send_file(shuffled_image))
-        response.headers["Content-Disposition"] = "inline; filename=shuffled.png"
-    file_paths = [temp_file.name, shuffled_image]
-    if index_file:
-        file_paths.append(index_file)
-    # cleanup_temp_files(file_paths)
+    upload_file_path = upload_path / origin_image.filename
+    origin_image.save(upload_file_path)
+
+    seed = request.form.get("seed")
+    seed = None if seed == "no" else int(seed)
+    index_file = upload_path / "indices.npz" if seed is None else None
+    image_quality = request.form.get("image_quality")
+
+    shuffle_pixels(upload_file_path, download_path, seed, index_file, image_quality)
+
+    response = make_response(send_file(download_path))
+    response.headers["Content-Disposition"] = f"attachment; filename={download_path.name}"
     return response
 
 
 @app.route("/recover", methods=["POST"])
-def recover() -> flask.Response:
+def recover() -> Response:
     """
     __doc__
     """
+    upload_path = Path('./files')
+    download_path = Path('./files') / "recovered.png"
+
+    upload_path.mkdir(parents=True, exist_ok=True)
+
     shuffled_image = request.files["shuffled_image"]
-    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-        shuffled_image.save(temp_file.name)
-        recovered_image = temp_file.name + ".png"
-        seed = request.form.get("seed")
-        seed = None if seed == "no" else int(seed)
-        index_file = temp_file.name + ".npz" if seed is None else None
-        image_quality = request.form.get("image_quality")
-        recover_pixels(temp_file.name, recovered_image, seed, index_file, image_quality)
-        response = make_response(send_file(recovered_image))
-        response.headers["Content-Disposition"] = "inline; filename=recovered.png"
-    file_paths = [temp_file.name, recovered_image]
-    if index_file:
-        file_paths.append(index_file)
-    # cleanup_temp_files(file_paths)
+    upload_file_path = upload_path / shuffled_image.filename
+    shuffled_image.save(upload_file_path)
+
+    seed = request.form.get("seed")
+    seed = None if seed == "no" else int(seed)
+    index_file = upload_path / "indices.npz" if seed is None else None
+    image_quality = request.form.get("image_quality")
+
+    recover_pixels(upload_file_path, download_path, seed, index_file, image_quality)
+
+    response = make_response(send_file(download_path))
+    response.headers["Content-Disposition"] = f"attachment; filename={download_path.name}"
     return response
 
 

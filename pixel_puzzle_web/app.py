@@ -16,9 +16,9 @@ from base64 import b64decode, b64encode
 from pathlib import Path
 from typing import Union
 
-import flask
 import numpy as np
-from flask import Flask, render_template, request, send_file
+from flask import (Flask, Response, make_response, render_template, request,
+                   send_file)
 from PIL import Image
 
 app = Flask(__name__)
@@ -138,7 +138,7 @@ def index() -> str:
 
 
 @app.route("/encode", methods=["POST"])
-def encode() -> flask.Response:
+def encode() -> Response:
     """
     __doc__
     """
@@ -146,11 +146,13 @@ def encode() -> flask.Response:
     encoded_text = "encoded.txt"
     image_to_encode.save(image_to_encode.filename)
     encode_base64(image_to_encode.filename, encoded_text)
-    return send_file(encoded_text, as_attachment=True)
+    response = make_response(send_file(encoded_text))
+    response.headers["Content-Disposition"] = "inline; filename=encoded.txt"
+    return response
 
 
 @app.route("/decode", methods=["POST"])
-def decode() -> flask.Response:
+def decode() -> Response:
     """
     __doc__
     """
@@ -158,11 +160,13 @@ def decode() -> flask.Response:
     decoded_image = "decoded.png"
     encoded_text.save(encoded_text.filename)
     decode_base64(encoded_text.filename, decoded_image)
-    return send_file(decoded_image, as_attachment=True)
+    response = make_response(send_file(decoded_image))
+    response.headers["Content-Disposition"] = "inline; filename=decoded.png"
+    return response
 
 
 @app.route("/shuffle", methods=["POST"])
-def shuffle() -> flask.Response:
+def shuffle() -> Response:
     """
     __doc__
     """
@@ -174,11 +178,13 @@ def shuffle() -> flask.Response:
     image_quality = request.form.get("image_quality")
     origin_image.save(origin_image.filename)
     shuffle_pixels(origin_image.filename, shuffled_image, seed, index_file, image_quality)
-    return send_file(shuffled_image, as_attachment=True)
+    response = make_response(send_file(shuffled_image))
+    response.headers["Content-Disposition"] = "inline; filename=shuffled.png"
+    return response
 
 
 @app.route("/recover", methods=["POST"])
-def recover() -> flask.Response:
+def recover() -> Response:
     """
     __doc__
     """
@@ -190,7 +196,9 @@ def recover() -> flask.Response:
     image_quality = request.form.get("image_quality")
     shuffled_image.save(shuffled_image.filename)
     recover_pixels(shuffled_image.filename, recovered_image, seed, index_file, image_quality)
-    return send_file(recovered_image, as_attachment=True)
+    response = make_response(send_file(recovered_image))
+    response.headers["Content-Disposition"] = "inline; filename=recovered.png"
+    return response
 
 
 if __name__ == "__main__":

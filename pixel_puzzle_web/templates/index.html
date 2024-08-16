@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Puzzle</title>
+</head>
+
+<body>
+    <h1>Pixel Puzzle</h1>
+    <form action="/encode" method="post" enctype="multipart/form-data">
+        <h2>Encode Image</h2>
+        <input type="file" name="image_to_encode" required>
+        <button type="submit">Encode</button>
+    </form>
+    <form action="/decode" method="post" enctype="multipart/form-data">
+        <h2>Decode Image</h2>
+        <input type="file" name="encoded_text" required>
+        <button type="submit">Decode</button>
+    </form>
+    <form action="/shuffle" method="post" enctype="multipart/form-data">
+        <h2>Shuffle Pixels</h2>
+        <input type="file" name="origin_image" required>
+        <input type="text" name="seed" placeholder="Seed (type 'no' for None)">
+        <select name="image_quality" required>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+        </select>
+        <button type="submit">Shuffle</button>
+    </form>
+    <form action="/recover" method="post" enctype="multipart/form-data">
+        <h2>Recover Pixels</h2>
+        <input type="file" name="shuffled_image" required>
+        <input type="text" name="seed" placeholder="Seed (type 'no' for None)">
+        <select name="image_quality" required>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+        </select>
+        <button type="submit">Recover</button>
+    </form>
+</body>
+
+</html>

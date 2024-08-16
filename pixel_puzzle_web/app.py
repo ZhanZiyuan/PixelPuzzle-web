@@ -17,8 +17,8 @@ from pathlib import Path
 from typing import Union
 
 import numpy as np
-from flask import (Flask, Response, after_this_request, make_response,
-                   render_template, request, send_file)
+from flask import (Flask, Response, make_response, render_template, request,
+                   send_file)
 from PIL import Image
 
 app = Flask(__name__)

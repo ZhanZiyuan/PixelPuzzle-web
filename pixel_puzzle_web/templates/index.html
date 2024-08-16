@@ -11,37 +11,39 @@
 
 <body>
   <h1>Pixel Puzzle</h1>
-  <div class="form-container">
-    <h2>Encode Image</h2>
-    <input type="file" name="image_to_encode" required>
-    <button type="submit">Encode</button>
-  </div>
-  <div class="form-container">
-    <h2>Decode Image</h2>
-    <input type="file" name="encoded_text" required>
-    <button type="submit">Decode</button>
-  </div>
-  <div class="form-container">
-    <h2>Shuffle Pixels</h2>
-    <input type="file" name="origin_image" required>
-    <input type="text" name="seed" placeholder="Seed (type 'no' for None)">
-    <select name="image_quality" required>
-      <option value="low">Low</option>
-      <option value="medium">Medium</option>
-      <option value="high">High</option>
-    </select>
-    <button type="submit">Shuffle</button>
-  </div>
-  <div class="form-container">
-    <h2>Recover Pixels</h2>
-    <input type="file" name="shuffled_image" required>
-    <input type="text" name="seed" placeholder="Seed (type 'no' for None)">
-    <select name="image_quality" required>
-      <option value="low">Low</option>
-      <option value="medium">Medium</option>
-      <option value="high">High</option>
-    </select>
-    <button type="submit">Recover</button>
+  <div class="grid-container">
+    <div class="form-container">
+      <h2>Encode Image</h2>
+      <input type="file" name="image_to_encode" required>
+      <button type="submit">Encode</button>
+    </div>
+    <div class="form-container">
+      <h2>Decode Image</h2>
+      <input type="file" name="encoded_text" required>
+      <button type="submit">Decode</button>
+    </div>
+    <div class="form-container">
+      <h2>Shuffle Pixels</h2>
+      <input type="file" name="origin_image" required>
+      <input type="text" name="seed" placeholder="Seed (type 'no' for None)">
+      <select name="image_quality" required>
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
+      <button type="submit">Shuffle</button>
+    </div>
+    <div class="form-container">
+      <h2>Recover Pixels</h2>
+      <input type="file" name="shuffled_image" required>
+      <input type="text" name="seed" placeholder="Seed (type 'no' for None)">
+      <select name="image_quality" required>
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
+      <button type="submit">Recover</button>
+    </div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.min.js"></script>
 </body>

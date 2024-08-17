@@ -25,7 +25,7 @@ app = Flask(__name__)
 
 
 def encode_base64(image_to_encode: str,
-                  encoded_text: Union[str, Path] = Path(__file__).with_suffix(".txt")) -> None:
+                  encoded_text: Union[str, Path] = Path("/tmp/encoded.txt")) -> None:
     """
     Encode the input image as a Base64 string.
     """
@@ -36,7 +36,7 @@ def encode_base64(image_to_encode: str,
 
 
 def decode_base64(encoded_text: str,
-                  decoded_image: Union[str, Path] = Path(__file__).with_suffix(".png")) -> None:
+                  decoded_image: Union[str, Path] = Path("/tmp/decoded.png")) -> None:
     """
     Decode the input Base64 string into an image.
     """
@@ -49,7 +49,7 @@ def decode_base64(encoded_text: str,
 def shuffle_pixels(origin_image: str,
                    shuffled_image: str,
                    seed: Union[int, None] = None,
-                   index_file: Union[str, Path, None] = Path(__file__).with_suffix(".npz"),
+                   index_file: Union[str, Path, None] = Path("/tmp/indices.npz"),
                    image_quality: str = "high") -> None:
     """
     Shuffle the arrangement of pixels on two dimensions.
@@ -90,7 +90,7 @@ def shuffle_pixels(origin_image: str,
 def recover_pixels(shuffled_image: str,
                    recovered_image: str,
                    seed: Union[int, None] = None,
-                   index_file: Union[str, Path, None] = Path(__file__).with_suffix(".npz"),
+                   index_file: Union[str, Path, None] = Path("/tmp/indices.npz"),
                    image_quality: str = "high") -> None:
     """
     Recover the arrangement of pixels on two dimensions.
@@ -142,8 +142,8 @@ def encode() -> Response:
     """
     __doc__
     """
-    upload_path = Path('./files')
-    download_path = Path('./files') / "encoded.txt"
+    upload_path = Path('/tmp')
+    download_path = Path('/tmp/encoded.txt')
 
     upload_path.mkdir(parents=True, exist_ok=True)
 
@@ -163,8 +163,8 @@ def decode() -> Response:
     """
     __doc__
     """
-    upload_path = Path('./files')
-    download_path = Path('./files') / "decoded.png"
+    upload_path = Path('/tmp')
+    download_path = Path('/tmp/decoded.png')
 
     upload_path.mkdir(parents=True, exist_ok=True)
 
@@ -184,8 +184,8 @@ def shuffle() -> Response:
     """
     __doc__
     """
-    upload_path = Path('./files')
-    download_path = Path('./files') / "shuffled.png"
+    upload_path = Path('/tmp')
+    download_path = Path('/tmp/shuffled.png')
 
     upload_path.mkdir(parents=True, exist_ok=True)
 
@@ -210,8 +210,8 @@ def recover() -> Response:
     """
     __doc__
     """
-    upload_path = Path('./files')
-    download_path = Path('./files') / "recovered.png"
+    upload_path = Path('/tmp')
+    download_path = Path('/tmp/recovered.png')
 
     upload_path.mkdir(parents=True, exist_ok=True)
 

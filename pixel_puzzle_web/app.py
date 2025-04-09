@@ -12,9 +12,11 @@ https://tutorial.helloflask.com/static/
 https://qiita.com/mink0212/items/a4eb875f19b0e47718d3
 """
 
+import hashlib
+import os
+import secrets
 from base64 import b64decode, b64encode
 from pathlib import Path
-from typing import Union
 
 import numpy as np
 from flask import (Flask, Response, make_response, render_template, request,
@@ -23,9 +25,14 @@ from PIL import Image
 
 app = Flask(__name__)
 
+UPLOAD_FOLDER = "/tmp"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+Path(app.config["UPLOAD_FOLDER"]).mkdir(parents=True, exist_ok=True)
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
-def encode_base64(image_to_encode: str,
-                  encoded_text: Union[str, Path] = Path("/tmp/encoded.txt")) -> None:
+
+def encode_base64(image_to_encode: str | Path,
+                  encoded_text: str | Path = Path(__file__).with_suffix(".txt")) -> None:
     """
     Encode the input image as a Base64 string.
     """
@@ -35,8 +42,8 @@ def encode_base64(image_to_encode: str,
             text_file.write(encoded_string)
 
 
-def decode_base64(encoded_text: str,
-                  decoded_image: Union[str, Path] = Path("/tmp/decoded.png")) -> None:
+def decode_base64(encoded_text: str | Path,
+                  decoded_image: str | Path = Path(__file__).with_suffix(".png")) -> None:
     """
     Decode the input Base64 string into an image.
     """
@@ -46,13 +53,13 @@ def decode_base64(encoded_text: str,
             image_file.write(decoded_output)
 
 
-def shuffle_pixels(origin_image: str,
-                   shuffled_image: str,
-                   seed: Union[int, None] = None,
-                   index_file: Union[str, Path, None] = Path("/tmp/indices.npz"),
+def shuffle_pixels(origin_image: str | Path,
+                   shuffled_image: str | Path,
+                   seed: int | None = None,
+                   index_file: str | Path | None = Path(__file__).with_suffix(".npz"),
                    image_quality: str = "high") -> None:
     """
-    Shuffle the arrangement of pixels on two dimensions.
+    Shuffle the arrangement of pixels.
     """
     scale_of_image_quality = {
         "low": 30,
@@ -62,21 +69,22 @@ def shuffle_pixels(origin_image: str,
 
     rng = np.random.default_rng(seed)
 
-    pixel_array = np.array(
-        Image.open(origin_image)
-    )
-    indices_shuffled_x = rng.permutation(pixel_array.shape[0])
-    indices_shuffled_y = rng.permutation(pixel_array.shape[1])
+    pixel_array = np.array(Image.open(origin_image))
+    image_size = pixel_array.shape
+    flat_pixels = pixel_array.reshape(-1, image_size[2])
+    pixel_indices = np.arange(flat_pixels.shape[0])
+
+    rng.shuffle(pixel_indices)
 
     if seed is None and index_file is not None:
-        np.savez(
+        np.savez_compressed(
             index_file,
-            indices_shuffled_x=indices_shuffled_x,
-            indices_shuffled_y=indices_shuffled_y
+            pixel_indices=pixel_indices,
+            image_size=image_size
         )
 
     shuffled_output = Image.fromarray(
-        pixel_array[indices_shuffled_x[:, np.newaxis], indices_shuffled_y, :]
+        flat_pixels[pixel_indices].reshape(image_size)
     )
     shuffled_output.save(
         shuffled_image,
@@ -87,13 +95,13 @@ def shuffle_pixels(origin_image: str,
     )
 
 
-def recover_pixels(shuffled_image: str,
-                   recovered_image: str,
-                   seed: Union[int, None] = None,
-                   index_file: Union[str, Path, None] = Path("/tmp/indices.npz"),
+def recover_pixels(shuffled_image: str | Path,
+                   recovered_image: str | Path,
+                   seed: int | None = None,
+                   index_file: str | Path | None = Path(__file__).with_suffix(".npz"),
                    image_quality: str = "high") -> None:
     """
-    Recover the arrangement of pixels on two dimensions.
+    Recover the arrangement of pixels.
     """
     scale_of_image_quality = {
         "low": 30,
@@ -101,24 +109,23 @@ def recover_pixels(shuffled_image: str,
         "high": 95
     }
 
-    pixel_array = np.array(
-        Image.open(shuffled_image)
-    )
+    pixel_array = np.array(Image.open(shuffled_image))
+    image_size = pixel_array.shape
+    flat_pixels = pixel_array.reshape(-1, image_size[2])
 
     if seed is not None and index_file is None:
         rng = np.random.default_rng(seed)
-        indices_shuffled_x = rng.permutation(pixel_array.shape[0])
-        indices_shuffled_y = rng.permutation(pixel_array.shape[1])
+        pixel_indices = np.arange(flat_pixels.shape[0])
+        rng.shuffle(pixel_indices)
     elif seed is None and index_file is not None:
         indices_data = np.load(index_file)
-        indices_shuffled_x = indices_data["indices_shuffled_x"]
-        indices_shuffled_y = indices_data["indices_shuffled_y"]
+        pixel_indices = indices_data["pixel_indices"]
+        image_size = tuple(indices_data["image_size"])
 
-    indices_recovered_x = np.argsort(indices_shuffled_x)
-    indices_recovered_y = np.argsort(indices_shuffled_y)
+    recovered_indices = np.argsort(pixel_indices)
 
     recovered_output = Image.fromarray(
-        pixel_array[indices_recovered_x[:, np.newaxis], indices_recovered_y, :]
+        flat_pixels[recovered_indices].reshape(image_size)
     )
     recovered_output.save(
         recovered_image,
@@ -127,6 +134,33 @@ def recover_pixels(shuffled_image: str,
         progressive=True,
         compress_level=9
     )
+
+
+def generate_secure_seed(method: str = "os",
+                         passphrase: str | None = None) -> int:
+    """
+    Generate a secure 128-bit random seed.
+    """
+    match method:
+        case "os":
+            return int.from_bytes(os.urandom(16), "big")
+
+        case "secrets":
+            return secrets.randbits(128)
+
+        case "hash":
+            if passphrase is None:
+                raise ValueError(
+                    'The "hash" method requires a non-empty passphrase string.'
+                )
+            hash_hex = hashlib.sha256(passphrase.encode("utf-8")).hexdigest()
+            return int(hash_hex, 16) % (2**128)
+
+        case _:
+            raise ValueError(
+                'Unsupported method. '
+                'Choose from "os", "secrets", or "hash".'
+            )
 
 
 @app.route("/")
@@ -142,13 +176,10 @@ def encode() -> Response:
     """
     __doc__
     """
-    upload_path = Path('/tmp')
-    download_path = Path('/tmp/encoded.txt')
-
-    upload_path.mkdir(parents=True, exist_ok=True)
+    download_path = Path(UPLOAD_FOLDER) / "encoded.txt"
 
     image_to_encode = request.files["image_to_encode"]
-    upload_file_path = upload_path / image_to_encode.filename
+    upload_file_path = Path(UPLOAD_FOLDER) / image_to_encode.filename
     image_to_encode.save(upload_file_path)
 
     encode_base64(upload_file_path, download_path)
@@ -163,13 +194,10 @@ def decode() -> Response:
     """
     __doc__
     """
-    upload_path = Path('/tmp')
-    download_path = Path('/tmp/decoded.png')
-
-    upload_path.mkdir(parents=True, exist_ok=True)
+    download_path = Path(UPLOAD_FOLDER) / "decoded.png"
 
     encoded_text = request.files["encoded_text"]
-    upload_file_path = upload_path / encoded_text.filename
+    upload_file_path = Path(UPLOAD_FOLDER) / encoded_text.filename
     encoded_text.save(upload_file_path)
 
     decode_base64(upload_file_path, download_path)
@@ -184,18 +212,15 @@ def shuffle() -> Response:
     """
     __doc__
     """
-    upload_path = Path('/tmp')
-    download_path = Path('/tmp/shuffled.png')
-
-    upload_path.mkdir(parents=True, exist_ok=True)
+    download_path = Path(UPLOAD_FOLDER) / "shuffled.png"
 
     origin_image = request.files["origin_image"]
-    upload_file_path = upload_path / origin_image.filename
+    upload_file_path = Path(UPLOAD_FOLDER) / origin_image.filename
     origin_image.save(upload_file_path)
 
-    seed = request.form.get("seed")
-    seed = None if seed == "no" else int(seed)
-    index_file = upload_path / "indices.npz" if seed is None else None
+    seed_str = request.form.get("seed")
+    seed = int(seed_str) if seed_str else None
+    index_file = Path(UPLOAD_FOLDER) / "indices.npz" if seed is None else None
     image_quality = request.form.get("image_quality")
 
     shuffle_pixels(upload_file_path, download_path, seed, index_file, image_quality)
@@ -210,18 +235,15 @@ def recover() -> Response:
     """
     __doc__
     """
-    upload_path = Path('/tmp')
-    download_path = Path('/tmp/recovered.png')
-
-    upload_path.mkdir(parents=True, exist_ok=True)
+    download_path = Path(UPLOAD_FOLDER) / "recovered.png"
 
     shuffled_image = request.files["shuffled_image"]
-    upload_file_path = upload_path / shuffled_image.filename
+    upload_file_path = Path(UPLOAD_FOLDER) / shuffled_image.filename
     shuffled_image.save(upload_file_path)
 
-    seed = request.form.get("seed")
-    seed = None if seed == "no" else int(seed)
-    index_file = upload_path / "indices.npz" if seed is None else None
+    seed_str = request.form.get("seed")
+    seed = int(seed_str) if seed_str else None
+    index_file = Path(UPLOAD_FOLDER) / "indices.npz" if seed is None else None
     image_quality = request.form.get("image_quality")
 
     recover_pixels(upload_file_path, download_path, seed, index_file, image_quality)

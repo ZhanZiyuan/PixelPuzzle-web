@@ -23,7 +23,11 @@ from flask import (Flask, Response, make_response, render_template, request,
                    send_file)
 from PIL import Image
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    static_folder="../static",
+    template_folder="../templates"
+)
 
 UPLOAD_FOLDER = "/tmp"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
@@ -255,4 +259,4 @@ def recover() -> Response:
 
 if __name__ == "__main__":
 
-    app.run(debug=True)
+    app.run()

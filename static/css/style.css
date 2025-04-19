@@ -119,9 +119,6 @@ body.dark-mode h2 {
 }
 
 #theme-toggle {
-    position: absolute;
-    top: 20px;
-    right: 20px;
     background-color: #3f51b5;
     color: white;
     border: none;
@@ -134,16 +131,32 @@ body.dark-mode h2 {
     background-color: #303f9f;
 }
 
+/* GitHub icon */
+#github-icon {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    margin-right: 10px;
+    /* Added margin to ensure spacing between the icon and button */
+}
+
+/* Header to hold the buttons */
+.header {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+}
+
 /* Mobile device optimization */
 @media (max-width: 600px) {
     body {
         padding: 10px;
     }
 
-    /* Use single column layout for forms */
     .grid-container {
         grid-template-columns: 1fr;
-        /* Single column layout */
         width: 100%;
         padding: 0 10px;
     }
@@ -161,15 +174,16 @@ body.dark-mode h2 {
 
     .form-container button {
         width: 100%;
-        /* Button takes full width of parent container */
         padding: 12px 0;
     }
 
     #theme-toggle {
-        top: 10px;
-        right: 10px;
         padding: 8px 16px;
-        /* Reduce button size */
+    }
+
+    #github-icon {
+        margin-right: 15px;
+        /* Adjusted margin for mobile */
     }
 }
 
@@ -178,7 +192,6 @@ body.dark-mode h2 {
     .grid-container {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        /* Two column layout */
         gap: 20px;
         padding: 0 20px;
     }

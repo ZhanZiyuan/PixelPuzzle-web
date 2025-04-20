@@ -177,11 +177,7 @@ def encode() -> Response:
     upload_file_path = Path(UPLOAD_FOLDER) / image_to_encode.filename
     image_to_encode.save(upload_file_path)
 
-    encoded_file_name = (
-        f"{Path(image_to_encode.filename).stem}"
-        "_encoded"
-        f"{Path(image_to_encode.filename).suffix}"
-    )
+    encoded_file_name = f"{Path(image_to_encode.filename).stem}_encoded.txt"
     download_path = Path(UPLOAD_FOLDER) / encoded_file_name
 
     encode_base64(upload_file_path, download_path)
@@ -200,11 +196,7 @@ def decode() -> Response:
     upload_file_path = Path(UPLOAD_FOLDER) / encoded_text.filename
     encoded_text.save(upload_file_path)
 
-    decoded_file_name = (
-        f"{Path(encoded_text.filename).stem}"
-        "_decoded"
-        f"{Path(encoded_text.filename).suffix}"
-    )
+    decoded_file_name = f"{Path(encoded_text.filename).stem}_decoded.png"
     download_path = Path(UPLOAD_FOLDER) / decoded_file_name
 
     decode_base64(upload_file_path, download_path)

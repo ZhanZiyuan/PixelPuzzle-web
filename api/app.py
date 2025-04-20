@@ -1,15 +1,8 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-https://github.com/google/material-design-lite
-
-https://geek-docs.com/flask/flask-questions/396_flask_how_to_connect_backend_python_flask_with_frontend_html_css_javascript.html
-
-https://blog.csdn.net/u011035397/article/details/103583205
-
-https://tutorial.helloflask.com/static/
-
-https://qiita.com/mink0212/items/a4eb875f19b0e47718d3
+Encode/decode images using Base64
+or shuffle/recover the pixels of images.
 """
 
 import hashlib
@@ -180,16 +173,21 @@ def encode() -> Response:
     """
     __doc__
     """
-    download_path = Path(UPLOAD_FOLDER) / "encoded.txt"
-
     image_to_encode = request.files["image_to_encode"]
     upload_file_path = Path(UPLOAD_FOLDER) / image_to_encode.filename
     image_to_encode.save(upload_file_path)
 
+    encoded_file_name = (
+        f"{Path(image_to_encode.filename).stem}"
+        "_encoded"
+        f"{Path(image_to_encode.filename).suffix}"
+    )
+    download_path = Path(UPLOAD_FOLDER) / encoded_file_name
+
     encode_base64(upload_file_path, download_path)
 
     response = make_response(send_file(download_path))
-    response.headers["Content-Disposition"] = f"attachment; filename={download_path.name}"
+    response.headers["Content-Disposition"] = f"attachment; filename={encoded_file_name}"
     return response
 
 
@@ -198,16 +196,21 @@ def decode() -> Response:
     """
     __doc__
     """
-    download_path = Path(UPLOAD_FOLDER) / "decoded.png"
-
     encoded_text = request.files["encoded_text"]
     upload_file_path = Path(UPLOAD_FOLDER) / encoded_text.filename
     encoded_text.save(upload_file_path)
 
+    decoded_file_name = (
+        f"{Path(encoded_text.filename).stem}"
+        "_decoded"
+        f"{Path(encoded_text.filename).suffix}"
+    )
+    download_path = Path(UPLOAD_FOLDER) / decoded_file_name
+
     decode_base64(upload_file_path, download_path)
 
     response = make_response(send_file(download_path))
-    response.headers["Content-Disposition"] = f"attachment; filename={download_path.name}"
+    response.headers["Content-Disposition"] = f"attachment; filename={decoded_file_name}"
     return response
 
 
@@ -216,11 +219,16 @@ def shuffle() -> Response:
     """
     __doc__
     """
-    download_path = Path(UPLOAD_FOLDER) / "shuffled.png"
+    original_image = request.files["origin_image"]
+    upload_file_path = Path(UPLOAD_FOLDER) / original_image.filename
+    original_image.save(upload_file_path)
 
-    origin_image = request.files["origin_image"]
-    upload_file_path = Path(UPLOAD_FOLDER) / origin_image.filename
-    origin_image.save(upload_file_path)
+    shuffled_file_name = (
+        f"{Path(original_image.filename).stem}"
+        "_shuffled"
+        f"{Path(original_image.filename).suffix}"
+    )
+    download_path = Path(UPLOAD_FOLDER) / shuffled_file_name
 
     seed_str = request.form.get("seed")
     seed = int(seed_str) if seed_str else None
@@ -230,7 +238,7 @@ def shuffle() -> Response:
     shuffle_pixels(upload_file_path, download_path, seed, index_file, image_quality)
 
     response = make_response(send_file(download_path))
-    response.headers["Content-Disposition"] = f"attachment; filename={download_path.name}"
+    response.headers["Content-Disposition"] = f"attachment; filename={shuffled_file_name}"
     return response
 
 
@@ -239,11 +247,16 @@ def recover() -> Response:
     """
     __doc__
     """
-    download_path = Path(UPLOAD_FOLDER) / "recovered.png"
-
     shuffled_image = request.files["shuffled_image"]
     upload_file_path = Path(UPLOAD_FOLDER) / shuffled_image.filename
     shuffled_image.save(upload_file_path)
+
+    recovered_file_name = (
+        f"{Path(shuffled_image.filename).stem}"
+        "_recovered"
+        f"{Path(shuffled_image.filename).suffix}"
+    )
+    download_path = Path(UPLOAD_FOLDER) / recovered_file_name
 
     seed_str = request.form.get("seed")
     seed = int(seed_str) if seed_str else None
@@ -253,7 +266,7 @@ def recover() -> Response:
     recover_pixels(upload_file_path, download_path, seed, index_file, image_quality)
 
     response = make_response(send_file(download_path))
-    response.headers["Content-Disposition"] = f"attachment; filename={download_path.name}"
+    response.headers["Content-Disposition"] = f"attachment; filename={recovered_file_name}"
     return response
 
 

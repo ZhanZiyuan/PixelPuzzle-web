@@ -1,3 +1,8 @@
+<p align="center">
+    <img alt="favicon" src="./static/images/favicon.svg"
+        width="138" />
+</p>
+
 # PixelPuzzle-web
 
 [![GitHub deployments](https://img.shields.io/github/deployments/ZhanZiyuan/PixelPuzzle-web/Production)](https://github.com/ZhanZiyuan/PixelPuzzle-web/blob/main/vercel.json)

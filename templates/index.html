@@ -2,35 +2,33 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pixel Puzzle</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Google Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet" />
 
-    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="../static/css/styles.css" />
 
     <!-- Favicon -->
     <link rel="icon" href="../static/images/favicon.svg" type="image/svg+xml" />
 </head>
 
 <body class="min-h-screen flex flex-col">
-
     <!-- Top App Bar -->
     <header
         class="sticky top-0 z-50 backdrop-blur-md bg-opacity-90 px-4 py-3 flex justify-between items-center shadow-sm"
-        style="background-color: var(--md-sys-color-surface);">
+        style="background-color: var(--md-sys-color-surface)">
         <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-3xl"
-                style="color: var(--md-sys-color-primary);">extension</span>
+            <span class="material-symbols-outlined text-3xl" style="color: var(--md-sys-color-primary)">extension</span>
             <h1 class="text-xl font-medium tracking-tight">Pixel Puzzle</h1>
         </div>
-        <a href="https://github.com/your-repo/pixel-puzzle" target="_blank"
+        <a href="https://github.com/ZhanZiyuan/PixelPuzzle" target="_blank"
             class="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors" title="View Source">
             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path fill-rule="evenodd"
@@ -43,78 +41,91 @@
     <!-- Main Content -->
     <main class="flex-grow flex items-center justify-center p-4">
         <div class="w-full max-w-lg rounded-[28px] overflow-hidden shadow-xl"
-            style="background-color: var(--md-sys-color-surface-variant);">
-
+            style="background-color: var(--md-sys-color-surface-variant)">
             <!-- Navigation Tabs -->
-            <div class="flex overflow-x-auto" role="tablist" style="background-color: var(--md-sys-color-surface);">
+            <div class="flex overflow-x-auto" role="tablist" style="background-color: var(--md-sys-color-surface)">
                 <button onclick="setMode('encode')" id="tab-encode"
-                    class="md-tab active flex-1 py-4 text-sm font-medium text-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors">Encode</button>
+                    class="md-tab active flex-1 py-4 text-sm font-medium text-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                    Encode
+                </button>
                 <button onclick="setMode('decode')" id="tab-decode"
-                    class="md-tab flex-1 py-4 text-sm font-medium text-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors">Decode</button>
+                    class="md-tab flex-1 py-4 text-sm font-medium text-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                    Decode
+                </button>
                 <button onclick="setMode('shuffle')" id="tab-shuffle"
-                    class="md-tab flex-1 py-4 text-sm font-medium text-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors">Shuffle</button>
+                    class="md-tab flex-1 py-4 text-sm font-medium text-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                    Shuffle
+                </button>
                 <button onclick="setMode('recover')" id="tab-recover"
-                    class="md-tab flex-1 py-4 text-sm font-medium text-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors">Recover</button>
+                    class="md-tab flex-1 py-4 text-sm font-medium text-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                    Recover
+                </button>
             </div>
 
             <!-- Form Container -->
-            <div class="p-6 md:p-8 flex flex-col gap-6" style="background-color: var(--md-sys-color-surface);">
-
+            <div class="p-6 md:p-8 flex flex-col gap-6" style="background-color: var(--md-sys-color-surface)">
                 <div class="text-center">
-                    <h2 id="form-title" class="text-2xl text-[var(--md-sys-color-on-surface)]">Encode Image</h2>
-                    <p id="form-desc" class="text-sm mt-1 text-[var(--md-sys-color-on-surface-variant)]">Convert an
-                        image to Base64 text.</p>
+                    <h2 id="form-title" class="text-2xl text-[var(--md-sys-color-on-surface)]">
+                        Encode Image
+                    </h2>
+                    <p id="form-desc" class="text-sm mt-1 text-[var(--md-sys-color-on-surface-variant)]">
+                        Convert an image to Base64 text.
+                    </p>
                 </div>
 
                 <form id="pixelForm" onsubmit="handleSubmit(event)" class="flex flex-col gap-5">
-
                     <!-- File Drop Zone -->
                     <div id="drop-zone"
                         class="border-2 border-dashed rounded-xl p-6 text-center transition-colors cursor-pointer"
-                        style="border-color: var(--md-sys-color-outline);"
+                        style="border-color: var(--md-sys-color-outline)"
                         onclick="document.getElementById('file-input').click()"
                         ondragover="event.preventDefault(); this.style.borderColor = 'var(--md-sys-color-primary)';"
                         ondragleave="this.style.borderColor = 'var(--md-sys-color-outline)';">
-
                         <span class="material-symbols-outlined text-4xl mb-2"
-                            style="color: var(--md-sys-color-primary);">cloud_upload</span>
+                            style="color: var(--md-sys-color-primary)">cloud_upload</span>
                         <p class="text-sm font-medium mb-1">Click or drag file here</p>
-                        <p id="file-name" class="text-xs text-[var(--md-sys-color-on-surface-variant)] opacity-70">No
-                            file selected</p>
-                        <input type="file" id="file-input" class="hidden" required onchange="updateFileName(this)">
+                        <p id="file-name" class="text-xs text-[var(--md-sys-color-on-surface-variant)] opacity-70">
+                            No file selected
+                        </p>
+                        <input type="file" id="file-input" class="hidden" required onchange="updateFileName(this)" />
                     </div>
 
                     <!-- Seed Input (Conditional) -->
                     <div id="seed-container" class="hidden">
                         <div class="md-input-container rounded-t-lg px-4 pt-5 pb-2 relative h-14 w-full bg-opacity-10 dark:bg-opacity-10"
-                            style="background-color: var(--md-sys-color-surface-variant);">
+                            style="background-color: var(--md-sys-color-surface-variant)">
                             <input type="number" id="seed-input" placeholder=" "
                                 class="md-input w-full bg-transparent border-none outline-none text-base h-full absolute bottom-0 left-4 z-10"
-                                style="color: var(--md-sys-color-on-surface-variant);">
+                                style="color: var(--md-sys-color-on-surface-variant)" />
                             <label for="seed-input"
                                 class="md-input-label absolute left-4 top-4 text-base pointer-events-none z-0">Seed
                                 (Required)</label>
                         </div>
-                        <p class="text-xs mt-1 ml-4" style="color: var(--md-sys-color-on-surface-variant);">Must be an
-                            integer.</p>
+                        <p class="text-xs mt-1 ml-4" style="color: var(--md-sys-color-on-surface-variant)">
+                            Must be an integer.
+                        </p>
                     </div>
 
                     <!-- Image Quality Input (Conditional for Shuffle/Recover) -->
                     <div id="quality-container" class="hidden">
                         <div class="md-input-container rounded-t-lg px-4 pt-5 pb-2 relative h-14 w-full bg-opacity-10 dark:bg-opacity-10"
-                            style="background-color: var(--md-sys-color-surface-variant);">
+                            style="background-color: var(--md-sys-color-surface-variant)">
                             <select id="quality-input"
                                 class="md-input w-full bg-transparent border-none outline-none text-base h-full absolute bottom-0 left-4 z-10"
-                                style="color: var(--md-sys-color-on-surface-variant); -webkit-appearance: none; appearance: none;">
+                                style="
+                    color: var(--md-sys-color-on-surface-variant);
+                    -webkit-appearance: none;
+                    appearance: none;
+                  ">
                                 <option value="low">Low</option>
                                 <option value="medium">Medium</option>
                                 <option value="high" selected>High</option>
                             </select>
                             <label for="quality-input" class="md-input-label absolute left-4 top-1 text-xs z-0"
-                                style="color: var(--md-sys-color-primary);">Image Quality (Required)</label>
+                                style="color: var(--md-sys-color-primary)">Image Quality (Required)</label>
                             <!-- Dropdown Icon -->
                             <span class="material-symbols-outlined absolute right-4 top-4 pointer-events-none"
-                                style="color: var(--md-sys-color-on-surface-variant);">arrow_drop_down</span>
+                                style="color: var(--md-sys-color-on-surface-variant)">arrow_drop_down</span>
                         </div>
                     </div>
 

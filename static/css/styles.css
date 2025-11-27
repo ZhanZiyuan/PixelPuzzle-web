@@ -1,0 +1,125 @@
+:root {
+    /* MD3 Light Theme Tokens */
+    --md-sys-color-primary: #0061a4;
+    --md-sys-color-on-primary: #ffffff;
+    --md-sys-color-primary-container: #d1e4ff;
+    --md-sys-color-on-primary-container: #001d36;
+    --md-sys-color-background: #fdfcff;
+    --md-sys-color-on-background: #1a1c1e;
+    --md-sys-color-surface: #fdfcff;
+    --md-sys-color-on-surface: #1a1c1e;
+    --md-sys-color-surface-variant: #e0e2ec;
+    --md-sys-color-on-surface-variant: #43474e;
+    --md-sys-color-outline: #74777f;
+    --md-sys-color-error: #ba1a1a;
+
+    --md-elevation-level1: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+    --md-elevation-level2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* MD3 Dark Theme Tokens */
+        --md-sys-color-primary: #9ecaff;
+        --md-sys-color-on-primary: #003258;
+        --md-sys-color-primary-container: #00497d;
+        --md-sys-color-on-primary-container: #d1e4ff;
+        --md-sys-color-background: #1a1c1e;
+        --md-sys-color-on-background: #e2e2e6;
+        --md-sys-color-surface: #1a1c1e;
+        --md-sys-color-on-surface: #e2e2e6;
+        --md-sys-color-surface-variant: #43474e;
+        --md-sys-color-on-surface-variant: #c4c6cf;
+        --md-sys-color-outline: #8e9099;
+        --md-sys-color-error: #ffb4ab;
+    }
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--md-sys-color-background);
+    color: var(--md-sys-color-on-background);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Material Inputs */
+.md-input-container {
+    position: relative;
+    background-color: var(--md-sys-color-surface-variant);
+    border-radius: 4px 4px 0 0;
+    border-bottom: 2px solid var(--md-sys-color-outline);
+}
+
+.md-input-container:focus-within {
+    border-bottom-color: var(--md-sys-color-primary);
+}
+
+.md-input-label {
+    color: var(--md-sys-color-on-surface-variant);
+    transition: all 0.2s ease-out;
+}
+
+/* For text/number inputs */
+.md-input:focus~.md-input-label,
+.md-input:not(:placeholder-shown)~.md-input-label {
+    top: 4px;
+    font-size: 0.75rem;
+    color: var(--md-sys-color-primary);
+}
+
+/* Buttons */
+.md-filled-button {
+    background-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    box-shadow: var(--md-elevation-level1);
+}
+
+.md-filled-button:hover {
+    box-shadow: var(--md-elevation-level2);
+    background-image: linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08));
+}
+
+/* Tabs */
+.md-tab {
+    border-bottom: 2px solid transparent;
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.md-tab.active {
+    border-bottom-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-primary);
+}
+
+/* Loading Spinner */
+.spinner {
+    border: 4px solid var(--md-sys-color-surface-variant);
+    border-top: 4px solid var(--md-sys-color-primary);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--md-sys-color-outline);
+    border-radius: 4px;
+}
